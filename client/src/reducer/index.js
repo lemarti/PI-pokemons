@@ -20,7 +20,7 @@ function rootReducer(state = initialState, action) {
     case "GET_DETAIL":
       return {
         ...state,
-        detail: action.payload,
+        detail: [action.payload],
       };
     case "GET_BY_NAME":
       return {
@@ -90,9 +90,14 @@ function rootReducer(state = initialState, action) {
               return 0;
             });
       return { ...state, pokemons: orderByAttack };
-      
+
     case "ORDER_BY_TYPE":
 
+      let orderByType = state.allPokemons.filter(({ Tipo }) => {
+        return Tipo.includes(action.payload) 
+      });
+
+      return { ...state, pokemons: orderByType };
     default:
       return state;
   }

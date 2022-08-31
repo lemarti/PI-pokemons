@@ -6,6 +6,8 @@ import {
   orderByName,
   orderByAttack,
   filterCreated,
+  orderByType,
+  getTypes,
 } from "../actions";
 import { Link } from "react-router-dom";
 import Card from "./Card";
@@ -32,7 +34,9 @@ export default function Home() {
   useEffect(() => {
     dispatch(getPokemons());
   }, []);
-
+  useEffect(() => {
+    dispatch(getTypes());
+  }, []);
   function handleOrderByName(e) {
     e.preventDefault();
     dispatch(orderByName(e.target.value));
@@ -40,7 +44,7 @@ export default function Home() {
     setOrder(`Ordenado ${e.target.value}`); //usamos estado para q re renderice cuando se cambia orden
   }
   function handleFilterCreated(e) {
-   e.preventDefault();
+    e.preventDefault();
     dispatch(filterCreated(e.target.value));
   }
 
@@ -50,36 +54,47 @@ export default function Home() {
     setCurrentPage(1);
     setOrder(`Ordenado ${e.target.value}`);
   }
+  const types = useSelector((state) => state.types);
 
+  function handleOrderByType(e) {
+    e.preventDefault();
+    dispatch(orderByType(e.target.value))
+    setOrder(`Ordenado${e.target.value}`)
+  }
   return (
     <div>
-      <Link to="/pokemon">Crear personaje</Link>
+      <Link to="/create">Crear personaje</Link>
       <SearchBar></SearchBar>
       <div>
-        <p>
+        <span>
           <select onChange={(e) => handleOrderByName(e)}>
             <option value="asc"> Ascendente</option>
             <option value="desc"> Descendente</option>
           </select>
-        </p>
-        <p>
+        </span>
+        <span>
           <select onChange={(e) => handleOrderByAttack(e)}>
             <option value="masAtt">Mayor ataque</option>
             <option value="menosAtt"> Menor ataque</option>
           </select>
-        </p>
-        <p>
-          <select>
-            <option value="tipo">Tipo</option>
-          </select>
-        </p>
-        <p>
+          </span>
+        <span>
+          <div>
+            <label>Tipos:</label>
+            <select onChange={(e)=>handleOrderByType(e)}>
+              {types.map((type) => (
+                <option value={type.Nombre}>{type.Nombre}</option>
+              ))}
+            </select>
+          </div>
+          </span>
+        <span>
           <select onChange={(e) => handleFilterCreated(e)}>
             <option value="todos">todos</option>
             <option value="existentes">existentes</option>
             <option value="CreadoenDB">mis pokemones</option>
           </select>
-        </p>
+          </span>
         <Pagination
           pokemonsPerPage={pokemonsPerPage}
           allPokemons={allPokemons.length}
@@ -90,7 +105,7 @@ export default function Home() {
       {currentPokemons?.map((poke) => {
         return (
           <div>
-            <Link to={"/pokemons/" + poke.ID}>
+            <Link to={`/pokemon/${poke.ID}`}>
               <Card
                 Nombre={poke.Nombre}
                 Imagen={poke.Imagen}
